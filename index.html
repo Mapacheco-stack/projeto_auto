@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mecânica Clara — Template</title>
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+
+<body>
+  <header class="cabecalho">
+    <div class="barra-navegacao">
+      <a class="marca" href="#">Mecânica Clara</a>
+
+      <nav class="navegacao" aria-label="Navegação principal">
+        <a href="#consulta">Consultar problema</a>
+        <a href="#sobre">Sobre o projeto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="introducao" id="sobre">
+      <div class="rotulo">Enciclopédia automotiva</div>
+      <h1>Entenda possíveis problemas do seu veículo.</h1>
+      <p>
+        Selecione o veículo e o problema observado para consultar informações
+        gerais, possíveis causas e orientações de segurança.
+      </p>
+    </section>
+
+    <section class="painel" id="consulta" aria-labelledby="titulo-consulta">
+      <div class="painel-cabecalho">
+        <div>
+          <h2 id="titulo-consulta">Comece uma consulta</h2>
+          <p>Escolha as opções abaixo para continuar.</p>
+        </div>
+        <span class="indicador-etapa" id="indicador-etapa">Etapa 1 de 3</span>
+      </div>
+
+      <div class="formulario">
+        <div class="campo">
+          <label for="fabricante">Fabricante</label>
+          <select id="fabricante">
+            <option value="">Selecione</option>
+            <option value="volkswagen">Volkswagen</option>
+            <option value="ford">Ford</option>
+            <option value="toyota">Toyota</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="modelo">Modelo</label>
+          <select id="modelo" disabled>
+            <option value="">Selecione primeiro o fabricante</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="problema">Problema observado</label>
+          <select id="problema" disabled>
+            <option value="">Selecione primeiro o modelo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="acoes">
+        <button class="botao" id="botao-consultar" disabled>
+          Ver possíveis causas
+        </button>
+      </div>
+    </section>
+
+    <section class="resultados" id="resultados" hidden aria-labelledby="titulo-resultados">
+      <div class="resultados-cabecalho">
+        <h2 id="titulo-resultados">Possíveis causas</h2>
+        <p id="resumo-selecao">Resultado da consulta.</p>
+      </div>
+
+      <div class="lista-causas" id="lista-causas"></div>
+
+      <div class="aviso">
+        <strong>Atenção</strong>
+        <p>
+          Este conteúdo é apenas informativo e não representa um diagnóstico.
+          Em caso de dúvida ou risco, interrompa o uso do veículo e consulte um
+          mecânico qualificado.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <strong>Mecânica Clara</strong> — informações gerais não substituem a
+    avaliação de um profissional.
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
