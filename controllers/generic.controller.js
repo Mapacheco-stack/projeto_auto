@@ -1,3 +1,4 @@
+import * as model from '../models/generic.model.js'
 import { gerarHashSenha } from './auth.controller.js'
 
 // Cria novo registro
