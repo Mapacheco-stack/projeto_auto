@@ -65,3 +65,8 @@ model problemas_causas {
 
   @@id([problema_id, causa_possivel_id], map: "pk_problemas_causas")
 }
+
+model admins {
+  senha String  @id @db.VarChar
+  nome  String? @db.VarChar(15)
+}

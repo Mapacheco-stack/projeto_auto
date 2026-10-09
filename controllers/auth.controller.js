@@ -39,7 +39,7 @@ export const login = async (req, res) => {
     }
 
     const token = gerarToken({ id: admin.id, admin: admins.admin }) //aqui oadmins se refere a tabela e o segundo ao campo
-    res.json({ autenticado: true, token })                           //eu acabei colocando o nome da tabela de admin e o campo que se refere ao nome do administrador como admin
+    res.json({ autenticado: true, token })                           //eu acabei colocando o nome da tabela de admin e o campo que se refere ao nome do    administrador como admin
   } catch (error) {
     res.status(500).json({ statusCode: 500, erro: error.message })
   }
