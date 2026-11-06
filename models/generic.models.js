@@ -1,57 +1,108 @@
-import prisma from '../config/database.js' 
 
-// Mapeia o nome que vem da Rota (plural) para o nome do Model no Prisma (singular)
+import prisma from '../config/database.js'
+
+// Mapeamento das rotas para os modelos Prisma
 const modelosPrisma = {
   problemas: 'problemas',
-  causas_possiveis: 'causas',
-  problemas_causas: 'prob_causa'
-
-
+  causas: 'causas_possiveis',
+  veiculos: 'modelos_veiculos',
+  fabricantes: 'fabricantes',
+  prob_causa: 'problemas_causas'
 }
 
-export const inserir = async (tabela, dados) => {
-  const modelo = modelosPrisma[tabela]
-  
-  // O Prisma já identifica os campos, descarta o que não existe e faz o INSERT
-  const result = await prisma[modelo].create({
-    data: dados
-  })
-  
-  return { id: result.id, criado: true }
-}
+// Obtém o modelo correspondente
+const obterModelo = (tabela) => {
+  const nomeModelo = modelosPrisma[tabela]
 
-export const listar = async (tabela, id = null) => {
-  const modelo = modelosPrisma[tabela]
-  
-  if (id) {
-    // Busca por ID (O Prisma exige que o ID seja numérico, por isso o Number)
-    return await prisma[modelo].findUnique({
-      where: { id: Number(id) }
-    })
+  if (!nomeModelo || !prisma[nomeModelo]) {
+    throw new Error(`Tabela não permitida ou inexistente: ${tabela}`)
   }
-  
-  // Se não tem ID, lista todos (Equivalente ao SELECT * FROM tabela)
-  return await prisma[modelo].findMany()
+
+  return prisma[nomeModelo]
 }
 
-export const atualizar = async (tabela, dados, id) => {
-  const modelo = modelosPrisma[tabela]
-  
-  // O Prisma atualiza apenas os campos que vieram dentro de "dados"
-  await prisma[modelo].update({
-    where: { id: Number(id) },
+// Identifica a chave primária
+const obterWhere = (tabela, identificador) => {
+  if (tabela === 'prob_causa') {
+    const problema_id = Number(identificador?.problema_id)
+    const causa_possivel_id = Number(identificador?.causa_possivel_id)
+
+    if (
+      !Number.isInteger(problema_id) ||
+      !Number.isInteger(causa_possivel_id)
+    ) {
+      throw new Error('Informe problema_id e causa_possivel_id válidos.')
+    }
+
+    return {
+      problema_id_causa_possivel_id: {
+        problema_id,
+        causa_possivel_id
+      }
+    }
+  }
+
+  const id = Number(identificador)
+
+  if (!Number.isInteger(id)) {
+    throw new Error('ID inválido.')
+  }
+
+  return { id }
+}
+
+// Criar registro
+export const inserir = async (tabela, dados) => {
+  const modelo = obterModelo(tabela)
+
+  const result = await modelo.create({
     data: dados
   })
-  
-  return { atualizado: true }
+
+  return {
+    criado: true,
+    registro: result
+  }
 }
 
-export const remover = async (tabela, id) => {
-  const modelo = modelosPrisma[tabela]
-  
-  await prisma[modelo].delete({
-    where: { id: Number(id) }
+// Listar registros
+export const listar = async (tabela, identificador = null) => {
+  const modelo = obterModelo(tabela)
+
+  if (identificador === null) {
+    return await modelo.findMany()
+  }
+
+  return await modelo.findUnique({
+    where: obterWhere(tabela, identificador)
   })
-  
-  return { excluido: true }
+}
+
+// Atualizar registro
+export const atualizar = async (tabela, dados, identificador) => {
+  const modelo = obterModelo(tabela)
+
+  const result = await modelo.update({
+    where: obterWhere(tabela, identificador),
+    data: dados
+  })
+
+  return {
+    atualizado: true,
+    registro: result
+  }
+}
+
+// Remover registro
+export const remover = async (tabela, identificador) => {
+  const modelo = obterModelo(tabela)
+
+  const result = await modelo.delete({
+    where: obterWhere(tabela, identificador)
+  })
+
+  return {
+    excluido: true,
+    registro: result
+  }
 }

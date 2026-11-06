@@ -1,15 +1,17 @@
 {
-  "name": "amigo-pet-mvc-api",
+  "name": "autowiki-mvc-api",
   "version": "2.0.0",
   "type": "module",
   "main": "./server.js",
   "scripts": {
     "dev": "node --watch ./server.js",
-    "start": "node --env-file=.env ./server.js"
+    "start": "node --env-file=.env ./server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^7.10.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -20,6 +22,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
-    "prisma": "^7.8.0"
+    "prisma": "^7.10.0"
   }
 }

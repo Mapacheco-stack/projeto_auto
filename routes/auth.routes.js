@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { login } from "../controllers/auth.controller";
+import { autenticar, login, perfilAdmin } from "../controllers/auth.controller.js";
 
 const router = Router()
 
-// login de admin oculto (verificação)
-    router.post('/logadmin', login)
+router.get('/logadmin', (req, res) => {
+  res.status(405).json({
+    statusCode: 405,
+    erro: 'Use POST /logadmin com { "admin": "...", "senha": "..." } para iniciar sessão.'
+  })
+})
 
-    export default router
+router.post('/logadmin', login)
+router.get('/admin/me', autenticar, perfilAdmin)
+
+export default router
