@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -18,9 +19,20 @@ app.use(express.urlencoded({ extended: true }))
 // Disponibiliza arquivos estáticos
 app.use(express.static(path.join(__dirname, 'views')))
 
-// Página inicial pública
+// Página inicial pública. O frontend é opcional no pacote do backend:
+// quando views/index.html existir, ele é servido; caso contrário, a API
+// continua funcional e informa como está disponível.
+const frontendPath = path.join(__dirname, 'views', 'index.html')
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'))
+  if (fs.existsSync(frontendPath)) {
+    return res.sendFile(frontendPath)
+  }
+
+  return res.json({
+    nome: 'AutoWiki API',
+    status: 'online',
+    mensagem: 'Frontend não incluído neste pacote do backend.'
+  })
 })
 
 // Rotas públicas de autenticação

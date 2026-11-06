@@ -1,3 +1,4 @@
+
 import { Router } from 'express'
 
 import * as controller from '../controllers/generic.controller.js'
@@ -5,27 +6,72 @@ import { autenticar } from '../controllers/auth.controller.js'
 
 const router = Router()
 
+// ======================================
+// CONSULTAS PÚBLICAS
+// ======================================
 
-//lista pública de problemas nos veículos e modelos de veículos
-router.get ('/problemas','problemas/:id', controller.listar)
-router.get ('/causas', 'causas/:id', controller.listar)
-router.get ('/veiculos', 'veiculos/:id', controller.listar)
+// Problemas
+router.get('/problemas', controller.listar)
+router.get('/problemas/:id', controller.listar)
 
-//rotas de acesso restrito aos admins (editar os problemas e suas possíveis causas)
+// Causas possíveis
+router.get('/causas', controller.listar)
+router.get('/causas/:id', controller.listar)
+
+// Modelos de veículos
+router.get('/veiculos', controller.listar)
+router.get('/veiculos/:id', controller.listar)
+
+// Fabricantes
+router.get('/fabricantes', controller.listar)
+router.get('/fabricantes/:id', controller.listar)
+
+// Relações entre problemas e causas
+router.get('/prob_causa', controller.listar)
+
+router.get(
+  '/prob_causa/:problema_id/:causa_possivel_id',
+  controller.listar
+)
+
+
+// ======================================
+// OPERAÇÕES RESTRITAS A ADMINISTRADORES
+// ======================================
+
+// Problemas
 router.post('/problemas', autenticar, controller.criar)
 router.put('/problemas/:id', autenticar, controller.atualizar)
 router.delete('/problemas/:id', autenticar, controller.remover)
 
+// Causas possíveis
 router.post('/causas', autenticar, controller.criar)
 router.put('/causas/:id', autenticar, controller.atualizar)
 router.delete('/causas/:id', autenticar, controller.remover)
 
-//rota de edição das relações entre os problemas por meio do id (tabela problemas_causas dentro do banco de dados) acessível somente ao admin
+// Modelos de veículos
+router.post('/veiculos', autenticar, controller.criar)
+router.put('/veiculos/:id', autenticar, controller.atualizar)
+router.delete('/veiculos/:id', autenticar, controller.remover)
 
-router.get('/prob_causa', 'prob_causa/:id', controller.listar)
-router.put('prob_causa/:id', controller.atualizar)
-router.post('/prob_causa', controller.criar)
-router.delete('prob_causa/:id', controller.remover)
+// Fabricantes
+router.post('/fabricantes', autenticar, controller.criar)
+router.put('/fabricantes/:id', autenticar, controller.atualizar)
+router.delete('/fabricantes/:id', autenticar, controller.remover)
 
+// Relações entre problemas e causas
+router.post('/prob_causa', autenticar, controller.criar)
+
+router.put(
+  '/prob_causa/:problema_id/:causa_possivel_id',
+  autenticar,
+  controller.atualizar
+)
+
+router.delete(
+  '/prob_causa/:problema_id/:causa_possivel_id',
+  autenticar,
+  controller.remover
+)
 
 export default router
