@@ -5,7 +5,16 @@ const AUDIO_SOURCES = {
   'possível desgaste do rolamento da roda': { file: '/audio/rolamento.mp3', label: 'Referência: ronco e raspagem de rolamento', source: 'Pixabay · Metal bearing rolling and spinning · freesound_community' },
   'possível desgaste ou folga na correia de acessórios': { file: '/audio/correia.mp3', label: 'Referência: partida com chiado de correia', source: 'Pixabay · Old car starting in winter · unfa' },
   'possível folga em componentes da suspensão': { file: '/audio/suspensao.mp3', label: 'Referência: rangido e gemido da suspensão', source: 'Pixabay · Car suspension creak · nmscher' },
-  'possível desgaste das pastilhas ou lonas de freio': { file: '/audio/freio.mp3', label: 'Referência: chiado de frenagem', source: 'Pixabay · Car braking · Universfield' }
+  'possível desgaste das pastilhas ou lonas de freio': { file: '/audio/freio.mp3', label: 'Referência: chiado de frenagem', source: 'Pixabay · Car braking · Universfield' },
+  'pastilhas ou lonas de freio desgastadas': { file: '/audio/freio-pastilhas.mp3', label: 'Referência: chiado agudo de travões sob pressão', source: 'Freesound · Car Brakes squeak screech squeal stop · WavJunction.com · CC0' },
+  'pinça de freio travada ou com movimento irregular': { file: '/audio/freio-pinca.mp3', label: 'Referência: ciclos de travagem com ruído irregular', source: 'Freesound · Large Old Car Starts and Stops with Brake Squeaks and Gears · craigsmith · CC0' },
+  'disco de freio empenado ou danificado': { file: '/audio/freio-disco.mp3', label: 'Referência: raspagem/chiado metálico associado à roda', source: 'Freesound · Car pass with rock in the brakes · tim.kahn · CC BY-NC 4.0' },
+  'velas de ignição desgastadas ou contaminadas': { file: '/audio/motor-misfire-continuo.mp3', label: 'Referência: falha contínua, engasgo e backfire do motor', source: 'Freesound · R03-12-Antique Auto Sputter and Backfire · craigsmith · CC0' },
+  'bobina ou cabo de ignição defeituoso': { file: '/audio/motor-ignicao-aceleracao.mp3', label: 'Referência: marcha lenta, aceleração e falhas de ignição', source: 'Freesound · Audi R8 Idling Reving Backfire · Jonas_Jocys · CC BY 4.0' },
+  'injetor de combustível obstruído ou com defeito': { file: '/audio/motor-engine-failure.mp3', label: 'Referência: motor falhando, engasgando e parando', source: 'Pixabay · Car Engine Failure · Universfield' },
+  'junta homocinética externa desgastada': { file: '/audio/direcao-junta.mp3', label: 'Referência: estalo/ruído de suspensão junto à roda', source: 'Freesound · car squeaky · shimsewn · CC BY 4.0' },
+  'pivô da suspensão com folga ou desgaste': { file: '/audio/direcao-pivo.mp3', label: 'Referência: ruído agudo de componente da suspensão', source: 'Freesound · squeaking suspension — link rod · Nikesh28 · CC BY-NC 4.0' },
+  'coxim ou rolamento superior do amortecedor desgastado': { file: '/audio/direcao-coxim.mp3', label: 'Referência: suspensão rangendo em baixa velocidade', source: 'Freesound · TESLA MODEL S interior · softwalls · CC BY-NC 4.0' }
 };
 let audioAtual = null;
 
@@ -14,9 +23,16 @@ const veiculoSelect = $('veiculo');
 const problemaSelect = $('problema');
 const consultarButton = $('consultar');
 const feedback = $('feedback');
-const problemaDropdown = document.querySelector('[data-custom-select="problema"]');
-const problemaTrigger = problemaDropdown?.querySelector('.custom-select-trigger');
-const problemaOptions = problemaDropdown?.querySelector('.custom-select-options');
+const dropdowns = [fabricanteSelect, veiculoSelect, problemaSelect].reduce((mapa, select) => {
+  const container = document.querySelector(`[data-custom-select="${select.id}"]`);
+  mapa[select.id] = {
+    select,
+    container,
+    trigger: container?.querySelector('.custom-select-trigger'),
+    options: container?.querySelector('.custom-select-options')
+  };
+  return mapa;
+}, {});
 
 async function apiGet(path) {
   const response = await fetch(`${API}${path}`, { headers: { Accept: 'application/json' } });
@@ -31,42 +47,45 @@ function normalizar(texto) {
 function preencherSelect(select, itens, textoInicial, valor = 'id', rotulo = 'nome') {
   select.replaceChildren(new Option(textoInicial, ''));
   itens.forEach((item) => select.add(new Option(item[rotulo], item[valor])));
-  if (select === problemaSelect) sincronizarDropdownProblema();
+  sincronizarDropdown(select);
 }
 
-function sincronizarDropdownProblema() {
-  if (!problemaTrigger || !problemaOptions) return;
-  problemaTrigger.textContent = problemaSelect.selectedOptions[0]?.textContent || 'Selecione o sintoma';
-  problemaTrigger.disabled = problemaSelect.disabled;
-  problemaTrigger.setAttribute('aria-disabled', String(problemaSelect.disabled));
-  problemaOptions.replaceChildren(...Array.from(problemaSelect.options).map((option) => {
+function sincronizarDropdown(select) {
+  const dropdown = dropdowns[select.id];
+  if (!dropdown?.trigger || !dropdown.options) return;
+  dropdown.trigger.textContent = select.selectedOptions[0]?.textContent || 'Selecione uma opção';
+  dropdown.trigger.disabled = select.disabled;
+  dropdown.trigger.setAttribute('aria-disabled', String(select.disabled));
+  dropdown.options.replaceChildren(...Array.from(select.options).map((option) => {
     const item = document.createElement('li');
     item.className = 'custom-select-option';
     item.setAttribute('role', 'option');
     item.dataset.value = option.value;
     item.textContent = option.textContent;
-    item.setAttribute('aria-selected', String(option.value === problemaSelect.value));
+    item.setAttribute('aria-selected', String(option.value === select.value));
     item.addEventListener('click', () => {
-      problemaSelect.value = option.value;
-      problemaSelect.dispatchEvent(new Event('change', { bubbles: true }));
-      fecharDropdownProblema();
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      fecharDropdown(select);
     });
     return item;
   }));
 }
 
-function fecharDropdownProblema() {
-  if (!problemaDropdown || !problemaTrigger || !problemaOptions) return;
-  problemaDropdown.classList.remove('is-open');
-  problemaTrigger.setAttribute('aria-expanded', 'false');
-  problemaOptions.hidden = true;
+function fecharDropdown(select) {
+  const dropdown = dropdowns[select.id];
+  if (!dropdown?.container || !dropdown.trigger || !dropdown.options) return;
+  dropdown.container.classList.remove('is-open');
+  dropdown.trigger.setAttribute('aria-expanded', 'false');
+  dropdown.options.hidden = true;
 }
 
-function alternarDropdownProblema() {
-  if (!problemaDropdown || problemaTrigger.disabled) return;
-  const aberto = problemaDropdown.classList.toggle('is-open');
-  problemaTrigger.setAttribute('aria-expanded', String(aberto));
-  problemaOptions.hidden = !aberto;
+function alternarDropdown(select) {
+  const dropdown = dropdowns[select.id];
+  if (!dropdown?.container || dropdown.trigger.disabled) return;
+  const aberto = dropdown.container.classList.toggle('is-open');
+  dropdown.trigger.setAttribute('aria-expanded', String(aberto));
+  dropdown.options.hidden = !aberto;
 }
 
 function atualizarEstadoConsulta() {
@@ -88,6 +107,7 @@ function carregarModelos() {
     veiculoSelect.add(new Option('Nenhum modelo cadastrado', ''));
   }
 
+  sincronizarDropdown(veiculoSelect);
   atualizarEstadoConsulta();
 }
 
@@ -95,7 +115,7 @@ function carregarProblemas() {
   const problemas = state.problemas;
   preencherSelect(problemaSelect, problemas, problemas.length ? 'Selecione o sintoma' : 'Nenhum sintoma cadastrado');
   problemaSelect.disabled = problemas.length === 0;
-  sincronizarDropdownProblema();
+  sincronizarDropdown(problemaSelect);
   atualizarEstadoConsulta();
 }
 
@@ -114,7 +134,8 @@ function elementoSeguro(tag, className, texto) {
 }
 
 function audioDaCausa(causa, problema) {
-  if (normalizar(problema?.nome) !== 'som estranho') return null;
+  const sintomasComAudio = ['som estranho', 'chiado ou ruido metalico ao frear', 'motor falhando ou engasgando', 'estalos ao estercar ou fazer curvas'];
+  if (!sintomasComAudio.includes(normalizar(problema?.nome))) return null;
   return Object.entries(AUDIO_SOURCES).find(([nome]) => normalizar(nome) === normalizar(causa.nome))?.[1] || null;
 }
 
@@ -275,22 +296,30 @@ async function iniciar() {
     feedback.textContent = 'Não foi possível carregar o catálogo. Verifique se a API e o banco de dados estão disponíveis e atualize a página.';
     problemaSelect.replaceChildren(new Option('Falha ao carregar os sintomas', ''));
     problemaSelect.disabled = true;
-    sincronizarDropdownProblema();
+    sincronizarDropdown(problemaSelect);
   }
 }
 
 fabricanteSelect.addEventListener('change', () => {
   veiculoSelect.value = '';
   carregarModelos();
+  sincronizarDropdown(fabricanteSelect);
 });
-veiculoSelect.addEventListener('change', atualizarEstadoConsulta);
-problemaSelect.addEventListener('change', () => {
-  sincronizarDropdownProblema();
+veiculoSelect.addEventListener('change', () => {
+  sincronizarDropdown(veiculoSelect);
   atualizarEstadoConsulta();
 });
-problemaTrigger?.addEventListener('click', alternarDropdownProblema);
+problemaSelect.addEventListener('change', () => {
+  sincronizarDropdown(problemaSelect);
+  atualizarEstadoConsulta();
+});
+Object.values(dropdowns).forEach(({ select, trigger }) => {
+  trigger?.addEventListener('click', () => alternarDropdown(select));
+});
 document.addEventListener('click', (event) => {
-  if (problemaDropdown && !problemaDropdown.contains(event.target)) fecharDropdownProblema();
+  Object.values(dropdowns).forEach(({ select, container }) => {
+    if (container && !container.contains(event.target)) fecharDropdown(select);
+  });
 });
 consultarButton.addEventListener('click', () => {
   if (!fabricanteSelect.value || !veiculoSelect.value || !problemaSelect.value) {
@@ -310,6 +339,7 @@ $('nova-consulta').addEventListener('click', () => {
   $('resultado').hidden = true;
   $('step-count').textContent = 'PASSO 1 DE 2';
   problemaSelect.value = '';
+  sincronizarDropdown(problemaSelect);
   atualizarEstadoConsulta();
   $('consulta').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
