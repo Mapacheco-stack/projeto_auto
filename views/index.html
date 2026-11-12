@@ -23,7 +23,7 @@
   <main class="wrap main-content">
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow"><span class="status-dot"></span> CENTRAL DE INFORMAÇÕES AUTOMOTIVAS</span>
+        <span class="eyebrow"><span class="status-dot"></span> CENTRAL DE REFERENCIAS AUTOMOTIVAS</span>
         <h1>Seu carro está dando sinais? <em>Vamos entender.</em></h1>
         <p>Selecione o sintoma apresentado pelo veículo para consultar problemas relacionados e suas possíveis causas.</p>
       </div>
@@ -34,8 +34,8 @@
       <div class="section-heading"><div><span class="step-label">01 / CONSULTA</span><h2 id="form-title">O que seu veículo está apresentando?</h2><p>Preencha os campos para encontrar informações relacionadas.</p></div><span class="step-count" id="step-count">PASSO 1 DE 2</span></div>
 
       <div class="form-grid">
-        <div class="field"><label for="fabricante">Fabricante</label><select id="fabricante"><option value="">Selecione o fabricante</option></select></div>
-        <div class="field"><label for="veiculo">Modelo do veículo</label><select id="veiculo" disabled><option value="">Selecione o fabricante primeiro</option></select></div>
+        <div class="field"><label for="fabricante">Fabricante</label><div class="custom-select" data-custom-select="fabricante"><select id="fabricante"><option value="">Selecione o fabricante</option></select><button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">Selecione o fabricante</button><ul class="custom-select-options" role="listbox" hidden></ul></div></div>
+        <div class="field"><label for="veiculo">Modelo do veículo</label><div class="custom-select" data-custom-select="veiculo"><select id="veiculo" disabled><option value="">Selecione o fabricante primeiro</option></select><button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled>Selecione o fabricante primeiro</button><ul class="custom-select-options" role="listbox" hidden></ul></div></div>
         <div class="field field-wide"><label for="problema">Sintoma apresentado pelo veículo</label><div class="custom-select" data-custom-select="problema"><select id="problema" disabled><option value="">Carregando sintomas cadastrados...</option></select><button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled>Carregando sintomas cadastrados...</button><ul class="custom-select-options" role="listbox" hidden></ul></div><span class="field-help">Selecione uma das opções disponíveis no catálogo.</span></div>
       </div>
       <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
