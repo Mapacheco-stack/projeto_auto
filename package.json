@@ -5,7 +5,7 @@
   "main": "./server.js",
   "scripts": {
     "dev": "node --watch ./server.js",
-    "start": "node --env-file=.env ./server.js",
+    "start": "node ./server.js",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate"
   },
